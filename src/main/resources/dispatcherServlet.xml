@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="com.ourfinal" use-default-filters="false">
+        <!-- 只扫描控制器 -->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- ssm中使用thymeleaf必须加以下代码来替代spring中的解析器，否则thymeleaf会遇到解析不了导致前端不报错也不显示的情况 -->
+    <bean id="templateResolver"
+          class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/pages/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML" />
+        <property name="cacheable" value="false" />
+        <property name="characterEncoding" value="UTF-8"/><!--不加会乱码-->
+    </bean>
+    <bean id="templateEngine"
+          class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+    </bean>
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+        <!--解决中文乱码-->
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+
+<!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+<!--        &lt;!&ndash; 前缀：视图文件的路径 &ndash;&gt;-->
+<!--        <property name="prefix" value="/pages/"/>-->
+<!--        &lt;!&ndash; 后缀：视图文件的扩展名 &ndash;&gt;-->
+<!--        <property name="suffix" value=".html"/>-->
+<!--    </bean>-->
+
+    <mvc:interceptors>
+        <!-- 声明第一个拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/**/*.css"/>
+            <mvc:exclude-mapping path="/**/*.js"/>
+            <mvc:exclude-mapping path="/**/*.jpg"/>
+            <mvc:exclude-mapping path="/pages/login.html"/>
+            <mvc:exclude-mapping path="/user/login.do"/>
+            <mvc:exclude-mapping path="/pages/register.html"/>
+            <mvc:exclude-mapping path="/user/register.do"/>
+            <!-- 声明拦截器对象 -->
+            <bean class="com.ourfinal.Interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+        <!-- 声明第二个拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/pages/main.html"/>
+            <bean class="com.ourfinal.Interceptor.ManagerInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
+    <mvc:resources location="/image/" mapping="/image/**"/>
+    <mvc:resources location="/jquery/" mapping="/jquery/**"/>
+    <mvc:resources location="/pages/" mapping="/pages/**"/>
+<!--    <mvc:default-servlet-handler/>-->
+    <mvc:annotation-driven/>
+</beans>

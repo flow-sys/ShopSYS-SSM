@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ourfinal.Repository.GoodsRepository">
+    <delete id="deleteGoodsByIds">
+        delete from tbl_goods where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findDeleteGoodsCount" resultType="int">
+        select count(*) from tbl_goods where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="updateGoodsByBeforeId">
+         update tbl_goods set
+            id=#{goods.id},
+            name=#{goods.name},
+            price=#{goods.price},
+            quantity=#{goods.quantity},
+            editTime=#{goods.editTime},
+            editBy=#{goods.editBy}
+            where id=#{beforeId}
+    </update>
+
+    <update id="updateGoodsById">
+        update tbl_goods set
+            name=#{name},
+            price=#{price},
+            quantity=#{quantity},
+            editTime=#{editTime},
+            editBy=#{editBy}
+            where id=#{id}
+    </update>
+
+    <select id="pageList" resultType="goods">
+        select * from tbl_goods
+        <where>
+            <if test="goods.id!=null and goods.id!=''">
+                id like '%' #{goods.id} '%'
+            </if>
+            <if test="goods.name!=null and goods.name!=''">
+                and name like '%' #{goods.name} '%'
+            </if>
+            <if test="goods.price!=null and goods.price!=''">
+                and price like '%${goods.price}%'
+            </if>
+            <if test="goods.quantity!=null and goods.quantity!=''">
+                and quantity like '%${goods.quantity}%'
+            </if>
+            <if test="goods.editBy!=null and goods.editBy!=''">
+                and editBy like '%' #{goods.editBy} '%'
+            </if>
+        </where>
+        order by CAST(id AS UNSIGNED)
+        limit #{skipPages},#{pageSize}
+    </select>
+
+    <select id="findAllGoodsCount" resultType="int">
+        select count(*) from tbl_goods
+        <where>
+            <if test="id!=null and id!=''">
+                id like '%' #{id} '%'
+            </if>
+            <if test="name!=null and name!=''">
+                and name like '%' #{name} '%'
+            </if>
+            <if test="price!=null and price!=''">
+                and price like '%${price}%'
+            </if>
+            <if test="quantity!=null and quantity!=''">
+                and quantity like '%${quantity}%'
+            </if>
+            <if test="editBy!=null and editBy!=''">
+                and editBy like '%' #{editBy} '%'
+            </if>
+        </where>
+    </select>
+
+    <select id="findGoodsById" resultType="goods">
+        select * from tbl_goods where id=#{id}
+    </select>
+
+    <insert id="addGoods">
+        insert into tbl_goods(
+            id,
+            name,
+            price,
+            quantity,
+            editTime,
+            editBy
+        ) values (
+            #{id},
+            #{name},
+            #{price},
+            #{quantity},
+            #{editTime},
+            #{editBy}
+        )
+    </insert>
+</mapper>
+    

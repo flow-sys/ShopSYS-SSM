@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="../jquery/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .registerForm{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("/image/image.jpg");
+        }
+        .container{
+            position: relative;
+            margin-top: 30px;
+            width: 300px;
+            height: 600px;
+            background: rgba(255,255,255,.4);
+        }
+        .subForm{
+            position: relative;
+            text-align: center;
+            margin-top: 30px;
+        }
+        a{
+            margin-top: 20px;
+            float: bottom;
+            float: left;
+            font-weight: 600;
+            color: royalblue;
+        }
+        a:hover{
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        $(function(){
+            $("#loginAct1").focus();
+            $(window).keydown(function(event){
+                if(event.keyCode == 13){
+                    submit();
+                }
+            })
+            $("#submitBtn").click(function(){
+                submit();
+            })
+        })
+
+        function submit() {
+            var loginAct = $.trim($("#loginAct").val());
+            var loginPwd = $.trim($("#loginPwd").val());
+            var name = $.trim($("#name").val());
+            var idnum = $.trim($("#idnum").val());
+            var email = $.trim($("#email").val());
+            var phonenum = $.trim($("#phonenum").val());
+            if(loginAct == "" || loginPwd == "" || name == ""
+                || idnum=="" || email == "" || phonenum == ""){
+                alert("请输入完整的信息");
+                return false;
+            }else{
+                $.ajax({
+                    url:"/user/register.do",
+                    data:{
+                        "loginAct":loginAct,
+                        "loginPwd":loginPwd,
+                        "name":name,
+                        "idnum":idnum,
+                        "email":email,
+                        "phonenum":phonenum
+                    },
+                    datatype:"json",
+                    type:"get",
+                    success:function (data) {
+                        if(data.success){
+                            window.location.href = "login.html"
+                        }else{
+                            $("#msg1").text(data.msg);
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="registerForm">
+    <div class="container">
+        <form class="subForm col-sm-12 col-ma-12 col-lg-12">
+            <div class="form-group ">
+                <label for="loginAct">登录用户名</label>
+                <input type="text" class="form-control" id="loginAct" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <label for="loginPwd">密码</label>
+                <input type="password" class="form-control" id="loginPwd" placeholder="Password">
+            </div>
+            <div class="form-group ">
+                <label for="name">真实姓名</label>
+                <input type="text" class="form-control" id="name" placeholder="Realname">
+            </div>
+            <div class="form-group">
+                <label for="idnum">身份证号</label>
+                <input type="text" class="form-control" id="idnum" placeholder="IdNumber">
+            </div>
+            <div class="form-group ">
+                <label for="email">邮箱</label>
+                <input type="email" class="form-control" id="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label for="phonenum">手机号码</label>
+                <input type="text" class="form-control" id="phonenum" placeholder="PhoneNumber">
+            </div>
+            <span id="msg1"></span>
+            <button type="button" id="submitBtn" class="btn btn-default">注册</button>
+        </form>
+        <a href="/pages/login.html">&lt;&lt;返回登录</a>
+    </div>
+</div>
+</body>
+</html>

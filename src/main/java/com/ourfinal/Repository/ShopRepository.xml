@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ourfinal.Repository.ShopRepository">
+    <insert id="insertOrderByOrder">
+        insert into tbl_order(
+            oid,
+            orderName,
+            orderNum,
+            total,
+            userId,
+            goodsId
+        ) values (
+            #{oid},
+            #{orderName},
+            #{orderNum},
+            #{total},
+            #{userId},
+            #{goodsId}
+        )
+    </insert>
+
+    <select id="findshopCarById" resultType="shopcar">
+        select * from tbl_shopcar where cid in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteShopCarByIds">
+        delete from tbl_shopcar where cid in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findShopCarCount" resultType="int">
+        select count(*) from tbl_shopcar where cid in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="ShopCarListByUserId" resultType="ShopCar">
+        select * from tbl_shopcar where userId = #{id};
+    </select>
+
+    <insert id="addGoodsToCarById">
+        insert into tbl_shopcar(
+            cid,
+            goodsName,
+            goodsNum,
+            countCost,
+            total,
+            userId,
+            fileName,
+            goodsid
+        )values (
+            #{cid},
+            #{goodsName},
+            #{goodsNum},
+            #{countCost},
+            #{total},
+            #{userId},
+            #{fileName},
+            #{goodsid}
+        )
+    </insert>
+</mapper>
+    

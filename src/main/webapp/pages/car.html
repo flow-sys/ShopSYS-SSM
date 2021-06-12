@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="../jquery/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <style>
+        .form-inline .form-group{
+            margin-bottom: 20px;
+            margin-left: 10px;
+        }
+        a{
+            color: royalblue;
+            font-weight: 600;
+        }
+        .goodsImg{
+            width: 100px;
+            height: 100px;
+        }
+        #settlement:hover{
+            background: coral;
+            border: none;
+        }
+        .costNum{
+            display: inline;
+            margin-right: 20px;
+            color: #e38d13;
+            font-size: 20px;
+        }
+        .costNum span{
+            font-size: 36px;
+        }
+
+    </style>
+    <script>
+        $(function(){
+            // ShopCarList();
+            //为全选复选框绑定事件，触发全选
+            $("#check_all").click(function(){
+                $("input[name=check]").prop("checked",this.checked);
+            })
+            //当用户没有全选时把全选框的选择取消
+            $(".GoodsList").on("click",$("input[name=check]"),function(){
+                $("#check_all").prop("checked",$("input[name=check]").length==$("input[name=check]:checked").length)
+            })
+
+            //删除购物车中商品
+            $("#deleteGoodsBtn").click(function(){
+                var $check = $("input[name=check]:checked");
+                if($check.length == 0){
+                    alert("请选择至少一个商品进行删除");
+                    return false;
+                }else{
+                    var param = "";
+                    for(var i = 0;i<$check.length;i++){
+                        param += "id=" + $($check[i]).val();
+                        if(i != $check.length-1){
+                            param += "&";
+                        }
+                    }
+                    $.ajax({
+                        url:"/shop/deleteShopCarByIds.do",
+                        data:param,
+                        type:"post",
+                        datatype:"json",
+                        success:function (data) {
+                            if(data.success){
+                                window.location.href = "/shop/goShopCar.do"
+                            }else{
+                                alert(data.msg);
+                            }
+                        }
+                    })
+                }
+            })
+            $("#settlement").click(function(){
+                var $check = $("input[name=check]:checked");
+                if($check.length == 0){
+                    alert("请选择至少一件商品进行结算");
+                }else{
+                    var param = "";
+                    for(var i = 0;i<$check.length;i++){
+                        param += "id=" + $($check[i]).val();
+                        if(i != $check.length-1){
+                            param += "&";
+                        }
+                    }
+                    $.ajax({
+                        url:"/shop/settlementById.do",
+                        data:param,
+                        type:"post",
+                        datatype:"json",
+                        success:function (data) {
+                            if(data.success){
+                                alert("购买成功");
+                                window.location.href = "/shop/goShopCar.do"
+                            }else{
+                                alert(data.msg);
+                            }
+                        }
+                    })
+                }
+            })
+            total();
+        })
+
+
+        function total() {
+            var array = $(".qprice");
+            var totalCost = 0;
+            for(var i = 0;i < array.length;i++){
+                var val = parseFloat($(".qprice").eq(i).text());
+                totalCost += val;
+            }
+            $("#totalCost").html(totalCost);
+        }
+    </script>
+</head>
+<body>
+
+
+<!-- 搭建显示页面 -->
+<div class="container">
+    <!-- 标题 -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1>购物车</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <a href="/pages/shop.html">&lt;&lt;返回购物</a>
+        </div>
+    </div>
+    <!-- 按钮 -->
+    <div class="row">
+        <div class="col-md-4 col-md-offset-10">
+            <button class="btn btn-danger" id="deleteGoodsBtn">
+                <span class="glyphicon glyphicon-trash" ></span> 删除商品
+            </button>
+        </div>
+    </div>
+    <!-- 显示表格数据 -->
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-hover" id="goods_table">
+                <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="check_all"/>
+                    </th>
+                    <th>商品编号</th>
+                    <th>商品名称</th>
+                    <th>商品样图</th>
+                    <th>商品单价</th>
+                    <th>小计</th>
+                    <th>数量</th>
+                </tr>
+                </thead>
+                <tbody class="GoodsList" th:each="shopcar:${scList}">
+                    <tr>
+                    <th><input type="checkbox" name="check" th:value="${shopcar.cid}"></th>
+                    <th th:text="${shopcar.goodsid}"></th>
+                    <th th:text="${shopcar.goodsName}"></th>
+                    <th><img th:src="'/image/'+${shopcar.fileName}" class="goodsImg"></th>
+                    <th th:text="${shopcar.countCost}"></th>
+                    <th th:text="${shopcar.total}" class="qprice"></th>
+                    <th th:text="${shopcar.goodsNum}"></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-offset-10">
+            <div class="costNum">
+                总价￥<span id="totalCost"></span>
+            </div>
+        <button type="button" class="btn btn-primary" id="settlement">
+            <span class="glyphicon glyphicon-barcode"></span> &nbsp;&nbsp;结算
+        </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
